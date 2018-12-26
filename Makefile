@@ -9,6 +9,7 @@ PREFIX     := arm-none-eabi-
 CC         := $(PREFIX)gcc
 OBJCOPY    := $(PREFIX)objcopy
 OBJDUMP    := $(PREFIX)objdump
+GDB        := $(PREFIX)gdb
 
 # Source Directories
 CMSIS_DIR  := $(STM32CUBE_F7)/Drivers/CMSIS
@@ -60,7 +61,7 @@ OBJECTS := $(OBJECTS_C) $(OBJECTS_S)
 
 all: $(IMAGE_NAME).hex
 
-.PHONY: clean flash disasm
+.PHONY: clean flash disasm debug
 
 # Mark the objects as precious to enable fast rebuilds.
 .PRECIOUS: $(OBJDIR)/%.o
@@ -78,6 +79,9 @@ flash: $(IMAGE_NAME).hex
 
 disasm: $(IMAGE_NAME).elf
 	$(OBJDUMP) -d $< > $(IMAGE_NAME).disasm
+
+debug: $(IMAGE_NAME).elf
+	$(GDB) $<
 
 #
 # Top-level Targets
