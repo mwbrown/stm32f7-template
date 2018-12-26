@@ -8,6 +8,7 @@ endif
 PREFIX     := arm-none-eabi-
 CC         := $(PREFIX)gcc
 OBJCOPY    := $(PREFIX)objcopy
+OBJDUMP    := $(PREFIX)objdump
 
 # Source Directories
 CMSIS_DIR  := $(STM32CUBE_F7)/Drivers/CMSIS
@@ -53,7 +54,7 @@ OBJECTS := $(OBJECTS_C) $(OBJECTS_S)
 
 all: $(IMAGE_NAME).hex
 
-.PHONY: clean flash
+.PHONY: clean flash disasm
 
 # Mark the objects as precious to enable fast rebuilds.
 .PRECIOUS: $(OBJDIR)/%.o
@@ -68,6 +69,9 @@ clean:
 
 flash: $(IMAGE_NAME).hex
 	echo "FIXME implement flashing via st-flash"
+
+disasm: $(IMAGE_NAME).elf
+	$(OBJDUMP) -d $< > $(IMAGE_NAME).disasm
 
 #
 # Top-level Targets
