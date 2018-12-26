@@ -26,6 +26,7 @@ INCLUDES :=                                          \
 	-I$(CMSIS_DIR)/Include                           \
 	-I$(CMSIS_DIR)/Device/ST/STM32F7xx/Include       \
 	-I$(HAL_DIR)/Inc                                 \
+	-I$(BSP_DIR)
 
 DEFINES := -DSTM32F746xx
 
@@ -44,14 +45,18 @@ APP_SOURCES :=                  \
 
 HAL_SOURCES :=                                \
 	$(HAL_DIR)/Src/stm32f7xx_hal.c            \
-	$(HAL_DIR)/Src/stm32f7xx_hal_pwr_ex.c     \
 	$(HAL_DIR)/Src/stm32f7xx_hal_cortex.c     \
+	$(HAL_DIR)/Src/stm32f7xx_hal_gpio.c       \
+	$(HAL_DIR)/Src/stm32f7xx_hal_pwr_ex.c     \
 	$(HAL_DIR)/Src/stm32f7xx_hal_rcc.c 
 
 STARTUP_SOURCES :=              \
 	src/startup_stm32f746xx.s
 
-SOURCES_C := $(APP_SOURCES) $(HAL_SOURCES)
+BSP_SOURCES :=                  \
+	$(BSP_DIR)/stm32746g_discovery.c
+
+SOURCES_C := $(APP_SOURCES) $(HAL_SOURCES) $(BSP_SOURCES)
 SOURCES_S := $(STARTUP_SOURCES)
 
 OBJECTS_C := $(addprefix $(OBJDIR)/, $(SOURCES_C:.c=.c.o))
