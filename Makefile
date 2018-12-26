@@ -45,8 +45,10 @@ STARTUP_SOURCES :=              \
 SOURCES_C := $(APP_SOURCES)
 SOURCES_S := $(STARTUP_SOURCES)
 
-OBJECTS_C := $(addprefix $(OBJDIR)/, $(SOURCES:.c=.c.o))
-OBJECTS_S := $(addprefix $(OBJDIR)/, $(SOURCES:.s=.s.o))
+OBJECTS_C := $(addprefix $(OBJDIR)/, $(SOURCES_C:.c=.c.o))
+OBJECTS_S := $(addprefix $(OBJDIR)/, $(SOURCES_S:.s=.s.o))
+
+OBJECTS := $(OBJECTS_C) $(OBJECTS_S)
 
 all: $(IMAGE_NAME).elf
 
