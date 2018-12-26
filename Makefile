@@ -1,0 +1,97 @@
+
+# Check for the presence of STM32CUBE_F7
+ifndef STM32CUBE_F7
+  $(error STM32CUBE_F7 must be set to the STM32Cube installation.)
+endif
+
+# Toolchain Configuration
+PREFIX     := arm-none-eabi-
+CC         := $(PREFIX)gcc
+OBJCOPY    := $(PREFIX)objcopy
+
+# Source Directories
+CMSIS_DIR  := $(STM32CUBE_F7)/Drivers/CMSIS
+HAL_DIR    := $(STM32CUBE_F7)/Drivers/STM32F7xx_HAL_Driver
+BSP_DIR    := $(STM32CUBE_F7)/Drivers/BSP/STM32746G-Discovery
+COMP_DIR   := $(STM32CUBE_F7)/Drivers/BSP/Components
+
+# Build variables
+OBJDIR     := build
+IMAGE_NAME := f7-tmpl
+
+INCLUDES :=                                          \
+	-Isrc                                            \
+	-I$(CMSIS_DIR)/Include                           \
+	-I$(CMSIS_DIR)/Device/ST/STM32F7xx/Include       \
+	-I$(HAL_DIR)/Inc                                 \
+
+DEFINES := -DCORE_M7 # FIXME
+
+# FIXME add FPU support
+CPUFLAGS := -mcpu=cortex-m7 -mthumb
+
+CFLAGS  = $(CPUFLAGS) -g -Os -ffreestanding -ffunction-sections -fdata-sections -Wall $(INCLUDES) $(DEFINES) 
+LDFLAGS = $(CPUFLAGS) -Wl,-Map=$(IMAGE_NAME).map -T STM32F746NGHx_FLASH.ld -specs=nano.specs -Wl,--gc-sections
+
+# Make implicit function declarations error out.
+CFLAGS += -Werror=implicit-function-declaration
+
+APP_SOURCES :=                  \
+	src/main.c
+
+STARTUP_SOURCES :=              \
+	src/startup_stm32f746xx.s
+
+SOURCES_C := $(APP_SOURCES)
+SOURCES_S := $(STARTUP_SOURCES)
+
+OBJECTS_C := $(addprefix $(OBJDIR)/, $(SOURCES:.c=.c.o))
+OBJECTS_S := $(addprefix $(OBJDIR)/, $(SOURCES:.s=.s.o))
+
+all: $(IMAGE_NAME).elf
+
+.PHONY: clean flash
+
+# Mark the objects as precious to enable fast rebuilds.
+.PRECIOUS: $(OBJDIR)/%.o
+
+#
+# Phony Targets
+#
+
+clean:
+	rm -f $(IMAGE_NAME).elf $(IMAGE_NAME).hex $(IMAGE_NAME).bin $(IMAGE_NAME).map
+	rm -rf $(OBJDIR)/
+
+flash: $(IMAGE_NAME).hex
+	echo "FIXME implement flashing via st-flash"
+
+#
+# Top-level Targets
+#
+
+$(IMAGE_NAME).elf: $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $^
+
+#
+# Pattern Rules
+#
+
+%.bin: %.elf
+	$(OBJCOPY) -O binary $< $@
+
+%.hex: %.elf
+	$(OBJCOPY) -O ihex $< $@
+
+-include $(OBJECTS_C:.o=.d)
+-include $(OBJECTS_S:.o=.d)
+
+$(OBJDIR)/%.c.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+	@$(CC) $(CFLAGS) -MM -MT $@ $< > $(OBJDIR)/$*.d
+
+$(OBJDIR)/%.s.o: %.s
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+	@$(CC) $(CFLAGS) -MM -MT $@ $< > $(OBJDIR)/$*.d
