@@ -51,7 +51,7 @@ OBJECTS_S := $(addprefix $(OBJDIR)/, $(SOURCES_S:.s=.s.o))
 
 OBJECTS := $(OBJECTS_C) $(OBJECTS_S)
 
-all: $(IMAGE_NAME).elf
+all: $(IMAGE_NAME).hex
 
 .PHONY: clean flash
 
