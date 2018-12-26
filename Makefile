@@ -41,10 +41,16 @@ APP_SOURCES :=                  \
 	src/main.c                  \
 	src/system_stm32f7xx.c
 
+HAL_SOURCES :=                                \
+	$(HAL_DIR)/Src/stm32f7xx_hal.c            \
+	$(HAL_DIR)/Src/stm32f7xx_hal_pwr_ex.c     \
+	$(HAL_DIR)/Src/stm32f7xx_hal_cortex.c     \
+	$(HAL_DIR)/Src/stm32f7xx_hal_rcc.c 
+
 STARTUP_SOURCES :=              \
 	src/startup_stm32f746xx.s
 
-SOURCES_C := $(APP_SOURCES)
+SOURCES_C := $(APP_SOURCES) $(HAL_SOURCES)
 SOURCES_S := $(STARTUP_SOURCES)
 
 OBJECTS_C := $(addprefix $(OBJDIR)/, $(SOURCES_C:.c=.c.o))
@@ -68,7 +74,7 @@ clean:
 	rm -rf $(OBJDIR)/
 
 flash: $(IMAGE_NAME).hex
-	echo "FIXME implement flashing via st-flash"
+	st-flash --reset --format ihex write $(IMAGE_NAME).hex
 
 disasm: $(IMAGE_NAME).elf
 	$(OBJDUMP) -d $< > $(IMAGE_NAME).disasm
