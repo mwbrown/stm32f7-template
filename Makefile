@@ -25,7 +25,7 @@ INCLUDES :=                                          \
 	-I$(CMSIS_DIR)/Device/ST/STM32F7xx/Include       \
 	-I$(HAL_DIR)/Inc                                 \
 
-DEFINES := -DCORE_M7 # FIXME
+DEFINES := -DSTM32F746xx
 
 # FIXME add FPU support
 CPUFLAGS := -mcpu=cortex-m7 -mthumb
@@ -37,7 +37,8 @@ LDFLAGS = $(CPUFLAGS) -Wl,-Map=$(IMAGE_NAME).map -T STM32F746NGHx_FLASH.ld -spec
 CFLAGS += -Werror=implicit-function-declaration
 
 APP_SOURCES :=                  \
-	src/main.c
+	src/main.c                  \
+	src/system_stm32f7xx.c
 
 STARTUP_SOURCES :=              \
 	src/startup_stm32f746xx.s
